@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float _groudnRadius = 0.5f;
     [SerializeField] LayerMask _groundMaks;
     [SerializeField] bool _isGrounded;
+    [Header("Respawn Transform")]
+    [SerializeField] Transform _respawn;
 
     void Awake()
     {
@@ -41,8 +43,8 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-       _isGrounded = Physics.CheckSphere(_groundCheck.position, _groudnRadius, _groundMaks);
-       if (_isGrounded && _velocity.y < 0.0f)
+        _isGrounded = Physics.CheckSphere(_groundCheck.position, _groudnRadius, _groundMaks);
+        if (_isGrounded && _velocity.y < 0.0f)
         {
             _velocity.y = -2.0f;
         }
@@ -52,7 +54,7 @@ public class PlayerController : MonoBehaviour
         _controller.Move(_velocity * Time.fixedDeltaTime);
     }
 
-   void OnDrawGizmos()
+    void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(_groundCheck.position, _groudnRadius);
@@ -60,8 +62,8 @@ public class PlayerController : MonoBehaviour
     
     void Jump()
     {
-       if (_isGrounded)
-       {
+        if (_isGrounded)
+        {
             _velocity.y = Mathf.Sqrt(_jumpHeight * -2.0f * _gravity);
         }
     }
@@ -69,5 +71,16 @@ public class PlayerController : MonoBehaviour
     void DebugMessage(InputAction.CallbackContext context)
     {
         Debug.Log($"Move Perfomed {context.ReadValue<Vector2>().x}, {context.ReadValue<Vector2>().y}");
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        Debug.Log($"Colliding with {other.tag}");
+        if (other.CompareTag("deathZone"))
+        {
+            _controller.enabled = false;
+            transform.position = _respawn.position;
+            _controller.enabled = true;
+        }
     }
 }
