@@ -56,7 +56,9 @@ public class PlayerController : Subject
         {
             _velocity.y = -2.0f;
         }
+#if !UNITY_EDITOR
         _move = _joystick.Direction;
+#endif
         _camForward = _camera.transform.forward;
         _camRight = _camera.transform.right;
         _camForward.y = 0.0f;
@@ -95,10 +97,15 @@ public class PlayerController : Subject
     {
         if (other.CompareTag("deathZone"))
         {
-            _controller.enabled = false;
-            transform.position = _respawn.position;
-            _controller.enabled = true;
+            MovePlayerPosition(_respawn.position);
             NotifyObservers(PlayerEnums.Died);
         }
+    }
+
+    public void MovePlayerPosition(Vector3 pos)
+    {
+        _controller.enabled = false;
+        transform.position = pos;
+        _controller.enabled = true;
     }
 }
